@@ -21,7 +21,22 @@ https://github.com/dreamgaussian/dreamgaussian/assets/25863658/db860801-7b9c-4b3
 - Run Gradio demo on Colab: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1owXJthskHoVXBNvxUB0Bg0JP2Rc7QsTe?usp=sharing)
 
 ## Install
+#### Tested on WSL2 (Ubuntu 22.04 LTS) with CUDA 12.1 and torch 2.1.0 with RTX 3090.
 
+Create a new conda env and activate it (I used an [older](https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh) conda version) using
+```bash
+conda create -n dg python=3.9.13 && conda activate dg
+```
+Remove 'torch' from requirements.txt (already done in this repo) and install it manually using
+```bash
+conda install pytorch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 pytorch-cuda=12.1 -c pytorch -c nvidia 
+```
+
+Since [OpenGL-CUDA interop is not yet supported on WSL2](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#features-not-yet-supported), you'll likely encounter a "OpenGL 4.4 or higher required" error.
+
+To bypass that, clone nvdiffrast inside dreamgaussian and replace all occurences of "RasterizeGLContext" with "RasterizeCudaContext" (in order to use CUDA-based rasterization).
+
+And run the following commands to install the rest of the dependencies:
 ```bash
 pip install -r requirements.txt
 
@@ -33,18 +48,15 @@ pip install ./diff-gaussian-rasterization
 pip install ./simple-knn
 
 # nvdiffrast
-pip install git+https://github.com/NVlabs/nvdiffrast/
+pip install ./nvdiffrast
 
 # kiuikit
 pip install git+https://github.com/ashawkey/kiuikit
 ```
 
-Tested on:
-
-- Ubuntu 22 with torch 1.12 & CUDA 11.6 on a V100.
-- Windows 10 with torch 2.1 & CUDA 12.1 on a 3070.
-
 ## Usage
+
+#### <ins>Note:</ins> Errors related to `dearpygui` were raised when using the `gui=True` option.
 
 Image-to-3D:
 
